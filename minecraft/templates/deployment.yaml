@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.minecraft.app.name }}
+  labels:
+    app: {{ .Values.minecraft.app.name }}
+spec:
+  replicas: {{ .Values.minecraft.replicaCount }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ .Values.minecraft.app.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.minecraft.app.name }}
+    spec:
+      containers:
+        - name: {{ .Values.minecraft.app.name }}
+          image: {{ .Values.minecraft.image | default "docker.io/itzg/minecraft-server:java21" }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: EULA
+              value: {{ .Values.minecraft.env.eula | default "TRUE" | quote }}
+            - name: TYPE
+              value: {{ .Values.minecraft.env.type | default "PAPER" | quote }}
+            - name: VERSION
+              value: {{ .Values.minecraft.env.version | default "LATEST" | quote }}
+            - name: MEMORY
+              value: {{ .Values.minecraft.env.memory | default "4G" | quote }}
+            - name: MOTD
+              value: {{ .Values.minecraft.env.motd | default "Welcome to our Minecraft Server!" | quote }}
+            - name: DIFFICULTY
+              value: {{ .Values.minecraft.env.difficulty | default "normal" | quote }}
+            - name: MODE
+              value: {{ .Values.minecraft.env.mode | default "survival" | quote }}
+            - name: PVP
+              value: {{ .Values.minecraft.env.pvp | default "true" | quote }}
+            - name: VIEW_DISTANCE
+              value: {{ .Values.minecraft.env.viewDistance | default "10" | quote }}
+            - name: ONLINE_MODE
+              value: {{ .Values.minecraft.env.onlineMode | default "true" | quote }}
+            - name: MAX_PLAYERS
+              value: {{ .Values.minecraft.env.maxPlayers | default "10" | quote }}
+            - name: ENABLE_RCON
+              value: {{ .Values.minecraft.env.enableRcon | default "false" | quote }}
+            {{- if .Values.minecraft.env.ops }}
+            - name: OPS
+              value: {{ .Values.minecraft.env.ops | quote }}
+            {{- end }}
+            {{- if .Values.minecraft.env.whitelist }}
+            - name: WHITELIST
+              value: {{ .Values.minecraft.env.whitelist | quote }}
+            {{- end }}
+          ports:
+            - name: minecraft
+              containerPort: 25565
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.minecraft.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          livenessProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            failureThreshold: 5
+          readinessProbe:
+            tcpSocket:
+              port: 25565
+            initialDelaySeconds: 45
+            periodSeconds: 15
+            failureThreshold: 3
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.minecraft.app.dataPvc | default "minecraft-data-pvc" }}

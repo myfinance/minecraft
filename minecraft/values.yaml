@@ -1,0 +1,33 @@
+# Default values for minecraft chart.
+minecraft:
+  replicaCount: 1
+  app:
+    name: minecraft
+    dataPvc: minecraft-data-pvc
+  persistence:
+    createPvc: true
+    storageClassName: longhorn-ssd
+    size: 20Gi
+  service:
+    type: LoadBalancer
+    port: 25565
+  resources:
+    limits:
+      cpu: "3000m"
+      memory: "6Gi"
+    requests:
+      cpu: "500m"
+      memory: "2Gi"
+  env:
+    eula: "TRUE"
+    type: "PAPER"
+    version: "LATEST"
+    memory: "4G"
+    motd: "Welcome to our Minecraft Server!"
+    difficulty: "normal"
+    mode: "survival"
+    pvp: "true"
+    viewDistance: "10"
+    onlineMode: "true"
+    maxPlayers: "10"
+    enableRcon: "false"

@@ -1,0 +1,40 @@
+{{- if .Values.minecraft.persistence.createPvc | default true }}
+{{- if .Values.minecraft.persistence.volumeName }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.minecraft.persistence.volumeName }}
+spec:
+  capacity:
+    storage: {{ .Values.minecraft.persistence.size }}
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ .Values.minecraft.persistence.storageClassName }}
+  csi:
+    driver: driver.longhorn.io
+    fsType: ext4
+    volumeHandle: {{ .Values.minecraft.persistence.volumeName }}
+  claimRef:
+    namespace: {{ .Release.Namespace }}
+    name: {{ .Values.minecraft.app.dataPvc | default "minecraft-data-pvc" }}
+---
+{{- end }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.minecraft.app.dataPvc | default "minecraft-data-pvc" }}
+  labels:
+    app: {{ .Values.minecraft.app.name }}
+spec:
+  storageClassName: {{ .Values.minecraft.persistence.storageClassName }}
+  {{- if .Values.minecraft.persistence.volumeName }}
+  volumeName: {{ .Values.minecraft.persistence.volumeName }}
+  {{- end }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.minecraft.persistence.size }}
+{{- end }}
