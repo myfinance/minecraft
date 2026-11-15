@@ -1,2 +1,2 @@
 minecraft:
-  image: docker.io/itzg/minecraft-server:java21
+  image: docker.io/itzg/minecraft-server:java25

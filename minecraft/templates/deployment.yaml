@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: {{ .Values.minecraft.app.name }}
-          image: {{ .Values.minecraft.image | default "docker.io/itzg/minecraft-server:java21" }}
+          image: {{ .Values.minecraft.image | default "docker.io/itzg/minecraft-server:java25" }}
           imagePullPolicy: IfNotPresent
           env:
             - name: EULA
