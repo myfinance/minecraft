@@ -30,3 +30,8 @@ Whenever you push changes to the `dev` branch, ArgoCD will automatically synchro
 
 ## Data & World Storage
 World data, player inventories, and server configs are stored on a persistent volume backed by `longhorn-ssd` (retained across restarts and pod updates).
+
+
+## connectivity
+
+192.168.100.33:25565
